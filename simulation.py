@@ -43,7 +43,11 @@ class Simulation:
                 if self.players[bettingPlayer].folded:
                     continue
 
-                bet = min(self.players[bettingPlayer].play(self.data), self.data["money"])
+                bet = 0
+                if self.players[bettingPlayer].bet == self.data["money"] == self.data["bet"]:
+                    bet = self.data["bet"]
+                else:
+                    bet = min(self.players[bettingPlayer].play(self.data), self.data["money"])
 
                 if bet == self.data["bet"]:
                     self.players[bettingPlayer].bet = bet
