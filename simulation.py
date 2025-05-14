@@ -11,17 +11,14 @@ class Simulation:
             "♦2", "♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦11", "♦12", "♦13", "♦14"
         ]
 
-        
         self.data = {}
-        self.data["cards"] = []
-        self.data["money"] = 500
-        self.data["bet"] = 10
-        self.data["pool"] = 0
-        self.data["folded"] = 0
-        self.data["players"] = len(self.players)
+        self.data["cards"] = [] # Cards on the table
+        self.data["money"] = 500 # Money given to players at the start of every round
+        self.data["bet"] = 10 # Starting bet
+        self.data["pool"] = 0 # Sum of all bets, the winning pot 
+        self.data["folded"] = 0 # Number of players, who have folded
+        self.data["players"] = len(self.players) # Number of players
         
-        
-
         self.dealer = 0 
 
     def play_round(self):
@@ -40,13 +37,13 @@ class Simulation:
             bettingPlayer = self.dealer
             passed = 0
             
-            while passed < len(self.players) - self.data["folded"] and self.data["folded"] < len(self.players) - 1:
-                bettingPlayer = (bettingPlayer+1) % (len(self.players) - self.data["folded"])
-                print(passed)
+            while passed < len(self.players) and self.data["folded"] < len(self.players) - 1:
+                
+                
                 # Skip turn if player has folded
                 if self.players[bettingPlayer].folded:
+                    passed += 1
                     continue
-
                 
                 # Skip turn if player has already gone all in
                 if self.data["money"] == self.players[bettingPlayer].bet:
@@ -66,17 +63,25 @@ class Simulation:
                     # Fold
                     self.players[bettingPlayer].folded = True
                     self.data["folded"] += 1
+                    passed += 1
+
+                    # Move to next player 
+                    bettingPlayer = (bettingPlayer+1) % len(self.players)
                     continue
 
+                # Change betting pool, minimum bet, player bet
                 self.data["pool"] += max(bet - self.players[bettingPlayer].bet, 0)
                 self.data["bet"] = bet
                 self.players[bettingPlayer].bet = bet
-                
+
+                # Move to next player
+                bettingPlayer = (bettingPlayer+1) % len(self.players)
 
         self.find_winner()
 
         self.reset()
 
+    # Restart the simulation after every round
     def reset(self):
         self.deck = [
             "♠1", "♠2", "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠11", "♠12", "♠13",
@@ -85,7 +90,6 @@ class Simulation:
             "♦1", "♦2", "♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦11", "♦12", "♦13"
         ]
         self.dealer = (self.dealer+1) % len(self.players)
-
 
         self.data = {}
         self.data["cards"] = []
@@ -110,6 +114,4 @@ class Simulation:
             else:
                 player.total -= player.bet
                 player.on_loss(self.data)
-            player.reset()
-            
-        
+            player.reset()    
