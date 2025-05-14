@@ -40,7 +40,7 @@ class Simulation:
             bettingPlayer = self.dealer
             passed = 0
             
-            while passed < len(self.players) and self.data["folded"] < len(self.players) - 1:
+            while passed < len(self.players) - self.data["folded"] and self.data["folded"] < len(self.players) - 1:
                 bettingPlayer = (bettingPlayer+1) % (len(self.players) - self.data["folded"])
                 print(passed)
                 # Skip turn if player has folded

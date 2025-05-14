@@ -45,13 +45,13 @@ def find_best_hand(cards):
     # Check for four of a kind
     four_kind = [rank for rank, freq in rank_counts.items() if freq == 4]
     if four_kind:
-        return "Four of a Kind", (7 + four_kind/100)
+        return "Four of a Kind", (7 + four_kind[0]/100)
 
     # Check for full house
     three_kind = [rank for rank, freq in rank_counts.items() if freq == 3]
     pair = [rank for rank, freq in rank_counts.items() if freq == 2]
     if three_kind and pair:
-        return "Full House", (6 + three_kind/100)
+        return "Full House", (6 + three_kind[0]/100)
 
     # Check for flush
     if flush_ranks:
@@ -79,4 +79,10 @@ def find_best_hand(cards):
         return "Pair", (1 + pair[0]/100)
 
     # Default for High card
-    return "High Card", sum(ranks[:5])/100
+    value = "0."
+    for rank in ranks[:5]:
+        value += str(rank).zfill(2)
+    return "High Card", float(value)
+
+
+print(find_best_hand(["♥2", "♥3", "♦10", "♥10", "♦10", "♥10", "♦6"]))

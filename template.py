@@ -32,8 +32,9 @@ class Algorithm(Player):
     def play(self, data):
         print("-------------------")
         print(self.name)
-        print(self.hand)
-        print(data)
+        print(f"Bet: {self.bet}")
+        print(f"Cards: {self.hand}")
+        print(f"Data:{data}")
         return int(input("Bet:"))
 
     # Function triggered when player wins a round (before reset)
