@@ -39,29 +39,40 @@ class Simulation:
 
             bettingPlayer = self.dealer
             passed = 0
-
-            while passed < len(self.players) and self.data["folded"] >= len(self.players) - 1:
+            
+            while passed < len(self.players) and self.data["folded"] < len(self.players) - 1:
                 bettingPlayer = (bettingPlayer+1) % (len(self.players) - self.data["folded"])
-
+                print(passed)
+                # Skip turn if player has folded
                 if self.players[bettingPlayer].folded:
                     continue
 
-                bet = 0
-                if self.players[bettingPlayer].bet == self.data["money"] == self.data["bet"]:
-                    bet = self.data["bet"]
-                else:
-                    bet = min(self.players[bettingPlayer].play(self.data), self.data["money"])
-
-                if bet == self.data["bet"]:
-                    self.players[bettingPlayer].bet = bet
+                
+                # Skip turn if player has already gone all in
+                if self.data["money"] == self.players[bettingPlayer].bet:
                     passed += 1
-                elif self.data["money"] >= bet > self.data["bet"]:
-                    self.players[bettingPlayer].bet = bet
-                    self.data["bet"] = bet
+                    continue
+                
+                bet = self.players[bettingPlayer].play(self.data)
+
+                
+                if bet == self.data["bet"]:
+                    # Call
+                    passed += 1
+                elif bet > self.data["bet"]:
+                    # Raise
                     passed = 1
                 else:
-                    self.data["folded"] += 1
+                    # Fold
                     self.players[bettingPlayer].folded = True
+                    self.data["folded"] += 1
+                    continue
+
+                self.data["pool"] += max(bet - self.players[bettingPlayer].bet, 0)
+                self.data["bet"] = bet
+                self.players[bettingPlayer].bet = bet
+                
+
         self.find_winner()
 
         self.reset()
@@ -95,10 +106,10 @@ class Simulation:
         for player in self.players:
             if player.hand_score == best_hand:
                 player.total += self.data["pool"] / winners
-                player.on_win()
+                player.on_win(self.data)
             else:
                 player.total -= player.bet
-                player.on_loss()
+                player.on_loss(self.data)
             player.reset()
             
         

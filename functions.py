@@ -79,4 +79,4 @@ def find_best_hand(cards):
         return "Pair", (1 + pair[0]/100)
 
     # Default for High card
-    return "High Card", ranks[:5]/100
+    return "High Card", sum(ranks[:5])/100

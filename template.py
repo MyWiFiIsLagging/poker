@@ -2,8 +2,8 @@ from player import Player
 
 class Algorithm(Player):
     # Feel free to add any custom variables
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name):
+        super().__init__(name)
 
 
 
@@ -30,14 +30,16 @@ class Algorithm(Player):
     # Please don't use any other variables
 
     def play(self, data):
+        print("-------------------")
+        print(self.name)
         print(self.hand)
         print(data)
-        return int(input("input"))
+        return int(input("Bet:"))
 
-    # Function triggered when player wins a round
-    def on_win(self):
-        pass
+    # Function triggered when player wins a round (before reset)
+    def on_win(self, data):
+        print(f"{self.name} won {data["pool"] - self.bet} chips")
     
-    # Function triggered when player loses a round
-    def on_loss(self):
-        pass
+    # Function triggered when player loses a round (before reset)
+    def on_loss(self, data):
+        print(f"{self.name} lost {self.bet} chips")

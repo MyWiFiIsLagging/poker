@@ -1,6 +1,8 @@
 class Player():
     # Create necessary variables
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
+
         self.hand = []
 
         self.bet = 0
