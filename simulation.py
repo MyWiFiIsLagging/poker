@@ -1,6 +1,11 @@
 import random
 from functions import find_best_hand
 
+# importing csv
+import csv
+
+
+
 class Simulation:
     def __init__(self, players):
         self.players = players
@@ -20,6 +25,11 @@ class Simulation:
         self.data["players"] = len(self.players) # Number of players
         
         self.dealer = 0 
+
+        self.table = {}
+        self.table["money"] = []
+        self.table["pools"] = []
+        self.table["folds"] = []
 
     def play_round(self):
         # Deal 2 cards to every player
@@ -81,8 +91,14 @@ class Simulation:
 
         self.reset()
 
+        self.create_table()
+
     # Restart the simulation after every round
     def reset(self):
+        self.table["money"].append(self.data["money"])
+        self.table["pools"].append(self.data["pool"])
+        self.table["folds"].append(self.data["folded"])
+
         self.deck = [
             "♠1", "♠2", "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠11", "♠12", "♠13",
             "♥1", "♥2", "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9", "♥10", "♥11", "♥12", "♥13",
@@ -100,18 +116,46 @@ class Simulation:
     
     def find_winner(self):
         for player in self.players:
-            player.hand_score = find_best_hand(player.hand + self.data["cards"])
+            hand = find_best_hand(player.hand + self.data["cards"])
+            player.table["hands"].append(hand[0])
+            player.hand_score = hand[1]
         
-        best_hand = max(player.hand_score for player in self.players)
+        best_hand = 0
+        for player in self.players:
+            if not player.folded and player.hand_score > best_hand:
+                best_hand = player.hand_score
         winners = 0
         for player in self.players:
-            if player.hand_score == best_hand:
+            if not player.folded and player.hand_score == best_hand:
                 winners += 1
         for player in self.players:
-            if player.hand_score == best_hand:
+            if not player.folded and player.hand_score == best_hand:
                 player.total += self.data["pool"] / winners
                 player.on_win(self.data)
             else:
                 player.total -= player.bet
                 player.on_loss(self.data)
-            player.reset()    
+            player.reset()
+
+    def create_table(self):
+        # File path for the CSV file
+        csv_file_path = 'tabulka.csv'
+
+        # Open the file in write mode
+        with open(csv_file_path, mode='w', newline='') as file:
+            # Create a csv.writer object
+            writer = csv.writer(file)
+            # Write data to the CSV file
+            for player in self.players:
+                writer.writerow([player.name, "Bets:"] + player.table["bets"])
+                writer.writerow([player.name, "Score:"] + player.table["scores"])
+                writer.writerow([player.name, "Hands:"] + player.table["hands"])
+                writer.writerow([player.name, "Balance:"] + player.table["balance"])
+            
+            writer.writerow(["Data", "Money:"] + self.table["money"])
+            writer.writerow(["Data", "Pool:"] + self.table["pools"])
+            writer.writerow(["Data", "Folds:"] + self.table["folds"])
+
+        # Print a confirmation message
+        print(f"CSV file '{csv_file_path}' created successfully.")
+    
