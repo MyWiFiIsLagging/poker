@@ -91,8 +91,6 @@ class Simulation:
 
         self.reset()
 
-        self.create_table()
-
     # Restart the simulation after every round
     def reset(self):
         self.table["money"].append(self.data["money"])
